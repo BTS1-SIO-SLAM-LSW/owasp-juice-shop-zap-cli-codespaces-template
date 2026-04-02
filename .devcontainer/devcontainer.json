@@ -1,32 +1,18 @@
 {
-  "name": "OWASP ZAP + OWASP Juice Shop",
-  "image": "mcr.microsoft.com/devcontainers/base:bookworm",
+  "name": "OWASP ZAP CLI + Juice Shop",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",
   "features": {
-    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
   },
-  "postCreateCommand": "bash .devcontainer/postCreate.sh",
-  "forwardPorts": [3000, 8080, 8090],
-  "portsAttributes": {
-    "3000": {
-      "label": "OWASP Juice Shop",
-      "onAutoForward": "notify"
-    },
-    "8080": {
-      "label": "OWASP ZAP Proxy",
-      "onAutoForward": "silent"
-    },
-    "8090": {
-      "label": "OWASP ZAP Web UI",
-      "onAutoForward": "notify"
-    }
-  },
+  "postCreateCommand": "chmod +x scripts/*.sh",
   "customizations": {
     "vscode": {
       "settings": {
         "terminal.integrated.defaultProfile.linux": "bash"
       },
       "extensions": [
-        "ms-azuretools.vscode-docker"
+        "ms-azuretools.vscode-docker",
+        "yzhang.markdown-all-in-one"
       ]
     }
   }

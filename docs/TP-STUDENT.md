@@ -1,98 +1,55 @@
-# TP étudiant — OWASP ZAP sur OWASP Juice Shop
+# TP étudiant — Analyse de OWASP Juice Shop avec OWASP ZAP CLI
 
 ## Contexte professionnel
 
-Vous travaillez comme développeur ou testeur sécurité dans une équipe chargée de vérifier la sécurité d'une application web avant sa mise en production.
+Vous êtes chargé d'analyser la sécurité d'une application web avant sa mise en production. Pour cette étude, vous utilisez une application pédagogique volontairement vulnérable : **OWASP Juice Shop**.
 
-Dans ce TP, l'application testée (**SUT**) est **OWASP Juice Shop**. L'outil d'analyse utilisé est **OWASP ZAP**.
+Votre mission consiste à lancer l'application, récupérer son URL publique dans GitHub Codespaces, exécuter un scan ZAP, puis analyser les résultats.
 
-## Mission
+## Étapes à réaliser
 
-Votre mission consiste à :
-
-- lancer l'application dans GitHub Codespaces ;
-- retrouver son URL publique ;
-- lancer OWASP ZAP ;
-- produire un rapport d'analyse ;
-- relever les alertes ;
-- proposer des corrections.
-
-## Étape 1 — Lancer l'application à tester
-
-Dans le terminal du Codespace :
+### Étape 1 — Lancer l'application
 
 ```bash
-bash scripts/start-juice-shop.sh
+bash scripts/start-sut.sh
 ```
 
-## Étape 2 — Retrouver l'URL publique du SUT
+### Étape 2 — Trouver l'URL publique du SUT
 
-Dans l'onglet **Ports** de Codespaces :
+Dans l'onglet **Ports**, repérez le port **3000** et copiez l'URL publique.
 
-- repérez le port **3000** ;
-- rendez-le **Public** si nécessaire ;
-- ouvrez l'URL associée.
-
-Vous devez utiliser cette URL dans ZAP. N'utilisez pas `localhost` dans le navigateur de votre ordinateur.
-
-## Étape 3 — Lancer OWASP ZAP
-
-Dans un second terminal :
+### Étape 3 — Exécuter un scan passif
 
 ```bash
-bash scripts/start-zap.sh
+bash scripts/zap-passive-scan.sh "https://<nom-du-codespace>-3000.app.github.dev"
 ```
 
-## Étape 4 — Ouvrir ZAP
+### Étape 4 — Consulter le rapport
 
-Dans l'onglet **Ports** :
+Ouvrez le fichier :
 
-- repérez le port **8090** ;
-- rendez-le **Public** si nécessaire ;
-- ouvrez l'URL ;
-- ajoutez `/zap` à la fin si besoin.
+```text
+reports/zap-passive-report.html
+```
 
-## Étape 5 — Lancer le scan recommandé
-
-Dans le terminal, lancez un **baseline scan** :
+### Étape 5 — Exécuter un full scan rapide
 
 ```bash
-bash scripts/zap-baseline.sh "https://<nom-du-codespace>-3000.app.github.dev"
+bash scripts/zap-full-scan-fast.sh "https://<nom-du-codespace>-3000.app.github.dev"
 ```
 
-Le rapport sera généré dans `reports/baseline-report.html`.
+### Étape 6 — Consulter le second rapport
 
-## Étape 6 — Lancer le full scan limité
+Ouvrez le fichier :
 
-Si votre enseignant vous le demande, vous pouvez lancer un **full scan limité** :
-
-```bash
-bash scripts/zap-full-scan-lite.sh "https://<nom-du-codespace>-3000.app.github.dev"
+```text
+reports/zap-full-fast-report.html
 ```
 
-Le rapport sera généré dans `reports/full-scan-lite-report.html`.
+## Questions
 
-## Travail à rendre
-
-Rédigez un compte rendu comportant :
-
-1. l'URL publique du SUT ;
-2. le type de scan utilisé ;
-3. le nombre d'URLs découvertes ;
-4. la liste d'au moins 5 alertes ;
-5. le niveau de risque de chaque alerte ;
-6. une explication claire de chaque alerte ;
-7. une proposition de correction pour chaque alerte ;
-8. une conclusion générale.
-
-## Questions d'analyse
-
-1. Quels en-têtes HTTP de sécurité semblent absents ou insuffisants ?
-2. Les cookies sont-ils correctement protégés ?
-3. ZAP remonte-t-il des informations techniques divulguées ?
-4. Quelles pages de Juice Shop paraissent particulièrement sensibles ?
-5. Quelles mesures un développeur SLAM pourrait-il proposer en priorité ?
-
-## Consigne importante
-
-Le **full scan classique** n'est pas demandé ici, car il peut être trop long et trop coûteux en CPU dans Codespaces. Le script fourni dans ce dépôt réalise un **full scan limité**, plus réaliste pour le temps d'un TP.
+1. Quelle est l'URL publique réellement utilisée pour scanner l'application ?
+2. Combien d'alertes apparaissent dans le rapport passif ?
+3. Quelles différences observez-vous entre le rapport passif et le full scan rapide ?
+4. Quelles vulnérabilités semblent particulièrement critiques ?
+5. Quelles corrections proposeriez-vous au développeur ?

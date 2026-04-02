@@ -1,203 +1,183 @@
-# Template repository — OWASP ZAP + OWASP Juice Shop (Codespaces)
+# Template GitHub Classroom / Codespaces — OWASP ZAP CLI + OWASP Juice Shop
 
-Ce template repository est destiné à des étudiants de **BTS SIO option SLAM**. Il permet de lancer, dans **GitHub Codespaces**, l'application à tester (**SUT**, *Software Under Test*) **OWASP Juice Shop** ainsi que l'outil d'audit **OWASP ZAP**.
+Ce dépôt est un **template repository** conçu pour des étudiants de **BTS SIO option SLAM**. Il permet de lancer une application web volontairement vulnérable, **OWASP Juice Shop**, puis d'exécuter des scans **OWASP ZAP en ligne de commande** dans **GitHub Codespaces**.
 
-L'objectif n'est pas de scanner Internet, mais d'analyser **uniquement** l'application fournie dans ce dépôt, dans un cadre pédagogique. Les étudiants doivent apprendre à retrouver l'URL publique de l'application dans Codespaces, à ouvrir ZAP dans le navigateur, puis à réaliser une analyse de sécurité raisonnable et exploitable dans le temps d'un TP.
+Le choix de la **version CLI de ZAP** est volontaire. En Codespaces, l'interface graphique Webswing de ZAP peut provoquer des redirections d'authentification et consommer beaucoup de ressources. Ici, le travail se fait donc à partir de scripts simples, reproductibles et proches d'un usage DevSecOps réel.
 
----
-
-## 1. Objectif pédagogique
+## Objectifs pédagogiques
 
 Ce template permet de travailler les compétences suivantes :
 
-- lancer une application web de test dans un environnement contrôlé ;
-- retrouver son URL publique dans GitHub Codespaces ;
-- lancer OWASP ZAP et comprendre son rôle de proxy d'audit ;
-- effectuer une exploration et un scan passif ;
-- générer un rapport HTML ;
-- interpréter les alertes remontées par ZAP ;
-- proposer des mesures correctives adaptées.
+- identifier l'URL publique d'une application exécutée dans Codespaces ;
+- réaliser un **scan passif** avec ZAP ;
+- réaliser un **full scan allégé**, plus rapide et moins gourmand en mémoire qu'un full scan classique ;
+- interpréter un rapport HTML de sécurité ;
+- proposer des mesures correctives en lien avec la cybersécurité applicative.
+
+## SUT utilisé
+
+Le **SUT** (*Software Under Test*) est :
+
+**OWASP Juice Shop**
+
+Il s'agit d'une application volontairement vulnérable, spécialement conçue pour l'apprentissage de la sécurité applicative. OWASP indique que Juice Shop est une application intentionnellement vulnérable, et sa documentation officielle propose notamment un lancement simple via Docker. citeturn118406search2turn118406search16
+
+## Pourquoi éviter le full scan classique ?
+
+La documentation officielle de ZAP précise que le **Full Scan** exécute un spider, éventuellement un AJAX spider, puis un active scan complet. Par défaut, il peut donc durer longtemps. À l'inverse, le **Baseline Scan** est limité dans le temps et ne réalise pas d'attaques actives, ce qui le rend beaucoup plus court. citeturn118406search1turn118406search7
+
+Pour cette raison, ce dépôt propose deux modes :
+
+- un **scan passif** recommandé pour tous les étudiants ;
+- un **full scan rapide** configuré pour être plus court et moins gourmand qu'un full scan brut.
+
+## Contenu du dépôt
+
+- `scripts/start-sut.sh` : lance OWASP Juice Shop ;
+- `scripts/print-urls.sh` : rappelle comment récupérer l'URL publique Codespaces ;
+- `scripts/zap-passive-scan.sh` : lance un **baseline scan** passif ;
+- `scripts/zap-full-scan-fast.sh` : lance un **full scan allégé** ;
+- `reports/` : contient les rapports HTML générés ;
+- `.devcontainer/` : configuration Codespaces.
 
 ---
 
-## 2. Structure du repository
+# Consignes étudiants
 
-- `.devcontainer/` : configuration GitHub Codespaces
-- `scripts/start-juice-shop.sh` : lancement du SUT OWASP Juice Shop
-- `scripts/start-zap.sh` : lancement de l'interface OWASP ZAP via Webswing
-- `scripts/zap-baseline.sh` : scan rapide recommandé pour les étudiants
-- `scripts/zap-full-scan-lite.sh` : full scan **limité** pour éviter une consommation CPU excessive
-- `scripts/print-urls.sh` : rappel des URLs probables dans Codespaces
-- `docs/TP-STUDENT.md` : consignes détaillées pour les étudiants
-- `reports/` : emplacement des rapports HTML générés
+## 1. Ouvrir le dépôt dans GitHub Codespaces
 
----
+Depuis votre dépôt GitHub Classroom, ouvrez le projet avec **GitHub Codespaces**.
 
-## 3. Principe général du TP
+Attendez que le conteneur de développement soit entièrement prêt.
 
-Dans ce dépôt, le **SUT testé est OWASP Juice Shop**.
-
-Les étudiants doivent :
-
-1. ouvrir leur dépôt GitHub Classroom dans **GitHub Codespaces** ;
-2. lancer **OWASP Juice Shop** ;
-3. repérer l'URL publique du port **3000** dans l'onglet **Ports** ;
-4. lancer **OWASP ZAP** ;
-5. ouvrir l'URL publique du port **8090** puis accéder à `/zap` ;
-6. utiliser l'URL publique de Juice Shop comme cible ;
-7. produire un rapport avec le **baseline scan** ou, pour les groupes avancés, avec le **full scan limité**.
-
-Dans Codespaces, **vous ne devez pas utiliser `localhost` dans le navigateur de votre machine**. Vous devez utiliser les **URLs publiques GitHub Codespaces**.
-
----
-
-## 4. Consignes de lancement pour les étudiants
-
-### Étape 1 — Ouvrir le dépôt dans GitHub Codespaces
-
-Depuis GitHub Classroom, ouvrez votre dépôt personnel puis choisissez **Open in Codespaces**.
-
-Attendez la fin du démarrage complet de l'environnement.
-
-### Étape 2 — Lancer OWASP Juice Shop
+## 2. Lancer le SUT
 
 Dans le terminal du Codespace, exécutez :
 
 ```bash
-bash scripts/start-juice-shop.sh
+bash scripts/start-sut.sh
 ```
 
-Ce script démarre le conteneur Docker de **OWASP Juice Shop** sur le **port 3000**.
+Ce script lance **OWASP Juice Shop** dans Docker sur le **port 3000**.
 
-### Étape 3 — Retrouver l'URL publique du SUT
+## 3. Récupérer l'URL publique de l'application
 
-Dans l'onglet **Ports** de Codespaces :
+Dans GitHub Codespaces, ouvrez l'onglet **Ports**.
 
-1. repérez le **port 3000** ;
-2. rendez-le **Public** si nécessaire ;
-3. ouvrez l'URL correspondante.
+Repérez le **port 3000**. Si besoin, rendez-le public.
 
-L'URL ressemblera à ceci :
+L'URL d'accès à l'application ne sera **pas** de la forme `http://localhost:3000`, mais de la forme :
 
 ```text
 https://<nom-du-codespace>-3000.app.github.dev
 ```
 
-C'est **cette URL** que vous devez utiliser dans ZAP.
-
-### Étape 4 — Lancer OWASP ZAP
-
-Dans un second terminal du Codespace, exécutez :
-
-```bash
-bash scripts/start-zap.sh
-```
-
-### Étape 5 — Ouvrir l'interface de ZAP
-
-Dans l'onglet **Ports** :
-
-1. repérez le **port 8090** ;
-2. rendez-le **Public** si nécessaire ;
-3. ouvrez l'URL correspondante ;
-4. ajoutez `/zap` à la fin de l'URL si nécessaire.
-
-Exemple :
-
-```text
-https://<nom-du-codespace>-8090.app.github.dev/zap
-```
-
-### Étape 6 — Lancer un scan rapide recommandé
-
-Le mode recommandé pour les étudiants est le **baseline scan**, car il est plus rapide et consomme moins de ressources qu'un full scan.
-
-Dans le terminal, remplacez l'URL ci-dessous par votre URL publique Juice Shop :
-
-```bash
-bash scripts/zap-baseline.sh "https://<nom-du-codespace>-3000.app.github.dev"
-```
-
-Le rapport HTML sera généré dans le dossier :
-
-```text
-reports/baseline-report.html
-```
-
-### Étape 7 — Lancer un full scan limité
-
-Le full scan classique est souvent trop long dans GitHub Codespaces. Ce template propose donc un **full scan limité**, avec un périmètre et une durée réduits, afin d'obtenir un rapport sans saturer inutilement le CPU.
-
-Commande :
-
-```bash
-bash scripts/zap-full-scan-lite.sh "https://<nom-du-codespace>-3000.app.github.dev"
-```
-
-Le rapport HTML sera généré dans :
-
-```text
-reports/full-scan-lite-report.html
-```
-
----
-
-## 5. Pourquoi le full scan classique posait problème
-
-Le full scan ZAP peut consommer beaucoup de CPU car il combine :
-
-- une phase de découverte du site ;
-- une phase d'analyse passive ;
-- une phase d'analyse active plus agressive.
-
-Sur GitHub Codespaces, cela peut devenir trop lourd si le scan n'est pas borné. Dans ce template, le script `zap-full-scan-lite.sh` réduit volontairement le temps consacré au spider et limite certaines durées d'analyse afin de rendre le scan exploitable dans le cadre d'un TP.
-
-Pour un travail étudiant standard, utilisez **d'abord** le baseline scan. Le full scan limité doit être réservé à une deuxième phase ou à un groupe avancé.
-
----
-
-## 6. Travail demandé aux étudiants
-
-Après lancement de Juice Shop et de ZAP, l'étudiant doit :
-
-1. noter l'URL publique du SUT ;
-2. lancer un baseline scan ;
-3. relever au moins **5 alertes** ;
-4. indiquer leur niveau de criticité ;
-5. expliquer le risque associé ;
-6. proposer une mesure corrective ;
-7. conclure sur l'état de sécurité apparent de l'application.
-
----
-
-## 7. Aide : affichage des URLs probables
-
-Pour afficher les URLs probables automatiquement :
+Vous pouvez aussi afficher un rappel avec :
 
 ```bash
 bash scripts/print-urls.sh
 ```
 
-L'onglet **Ports** reste toutefois la source la plus fiable.
+Ouvrez ensuite cette URL dans votre navigateur. Vous devez voir **OWASP Juice Shop**.
+
+## 4. Lancer le scan passif recommandé
+
+Le scan passif est le mode à utiliser en priorité. Il s'appuie sur le script officiel **`zap-baseline.py`**, qui effectue un spider limité dans le temps puis attend la fin du passive scanning. La documentation officielle indique que ce script ne réalise pas d'attaques actives et qu'il est conçu pour rester relativement court. citeturn118406search7turn118406search4
+
+Commande :
+
+```bash
+bash scripts/zap-passive-scan.sh "https://<nom-du-codespace>-3000.app.github.dev"
+```
+
+Le rapport est généré dans :
+
+```text
+reports/zap-passive-report.html
+```
+
+## 5. Lancer le full scan rapide
+
+Ce dépôt contient aussi un **full scan rapide**. Il utilise le script officiel **`zap-full-scan.py`**, mais avec des limitations explicites afin de réduire la durée du spider, de désactiver l'AJAX spider et de borner le temps maximal de scan. La documentation officielle précise en effet que le full scan brut peut durer longtemps, notamment parce qu'il enchaîne spider, AJAX spider optionnel et active scan complet. citeturn118406search1turn118406search4
+
+Commande :
+
+```bash
+bash scripts/zap-full-scan-fast.sh "https://<nom-du-codespace>-3000.app.github.dev"
+```
+
+Le rapport est généré dans :
+
+```text
+reports/zap-full-fast-report.html
+```
+
+## 6. Travail demandé
+
+Après exécution d'un scan, consultez le rapport HTML et relevez :
+
+- le nombre d'alertes détectées ;
+- les niveaux de gravité ;
+- les URL concernées ;
+- les mesures correctives proposées.
+
+Vous devez ensuite rédiger une courte analyse :
+
+1. Quelles vulnérabilités ou mauvaises configurations ont été détectées ?
+2. Lesquelles relèvent d'un problème de développement applicatif ?
+3. Lesquelles relèvent d'un problème de configuration HTTP ou navigateur ?
+4. Quelles corrections proposeriez-vous ?
 
 ---
 
-## 8. Arrêt des services
+# Commandes utiles
 
-Pour arrêter Juice Shop :
+Lancer le SUT :
+
+```bash
+bash scripts/start-sut.sh
+```
+
+Afficher un rappel sur l'URL Codespaces :
+
+```bash
+bash scripts/print-urls.sh
+```
+
+Lancer le scan passif :
+
+```bash
+bash scripts/zap-passive-scan.sh "https://<nom-du-codespace>-3000.app.github.dev"
+```
+
+Lancer le full scan rapide :
+
+```bash
+bash scripts/zap-full-scan-fast.sh "https://<nom-du-codespace>-3000.app.github.dev"
+```
+
+Arrêter le SUT :
 
 ```bash
 docker stop juice-shop
 ```
 
-Pour arrêter ZAP :
+---
 
-```bash
-docker stop zap-webswing
-```
+# Remarques pour l'enseignant
+
+Le **scan passif** est celui à privilégier en séance, car il reste léger et produit un rapport exploitable rapidement. Le **full scan rapide** est un compromis : il ne remplace pas un full scan complet, mais il permet d'obtenir davantage de résultats sans bloquer trop longtemps un Codespace.
+
+Sur le plan technique :
+
+- le **passive scan** fixe une courte durée de spider ;
+- le **full scan rapide** fixe une durée courte de spider, désactive l'AJAX spider et borne le temps total.
+
+Cela ne garantit pas un temps identique dans tous les Codespaces, mais réduit nettement les risques de scans interminables.
 
 ---
 
-## 9. Remarque importante
+# Références
 
-Ce dépôt doit être utilisé **uniquement** dans un cadre pédagogique sur l'application fournie. Il ne faut pas l'utiliser pour scanner un site tiers sans autorisation.
+- Documentation ZAP Docker : scripts Baseline Scan et Full Scan. citeturn118406search0turn118406search1turn118406search7
+- Documentation OWASP / Juice Shop : application volontairement vulnérable et déploiement Docker. citeturn118406search2turn118406search16
