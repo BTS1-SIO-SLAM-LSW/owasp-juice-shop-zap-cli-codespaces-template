@@ -262,12 +262,3 @@ docker stop juice-shop
 ```
 
 ---
-
-# Remarques pour l'enseignant
-
-Le **scan passif** est celui à privilégier en séance, car il reste léger et produit un rapport exploitable rapidement. Le **full scan rapide** est un compromis : il ne remplace pas un full scan complet, mais il permet d'obtenir davantage de résultats sans bloquer trop longtemps un Codespace.
-
-Ce template est donc adapté à une progression pédagogique en deux temps :
-
-1. découverte des alertes avec le scan passif ;
-2. approfondissement avec le full scan rapide.
