@@ -4,16 +4,21 @@
   "features": {
     "ghcr.io/devcontainers/features/docker-in-docker:2": {}
   },
-  "postCreateCommand": "chmod +x scripts/*.sh",
   "customizations": {
     "vscode": {
       "settings": {
         "terminal.integrated.defaultProfile.linux": "bash"
       },
       "extensions": [
-        "ms-azuretools.vscode-docker",
-        "yzhang.markdown-all-in-one"
+        "ms-azuretools.vscode-docker"
       ]
+    }
+  },
+  "postCreateCommand": "sudo chmod +x scripts/*.sh && mkdir -p reports",
+  "forwardPorts": [3000],
+  "portsAttributes": {
+    "3000": {
+      "label": "OWASP Juice Shop"
     }
   }
 }

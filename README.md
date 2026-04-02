@@ -1,76 +1,73 @@
-# Template GitHub Classroom / Codespaces — OWASP ZAP CLI + OWASP Juice Shop
+# Template GitHub Classroom — OWASP ZAP CLI + OWASP Juice Shop
 
-Ce dépôt est un **template repository** destiné à des étudiants de **BTS SIO option SLAM**. Il permet de lancer une application web volontairement vulnérable, **OWASP Juice Shop**, puis d'exécuter des scans **OWASP ZAP en ligne de commande** dans **GitHub Codespaces**.
+Ce dépôt sert de **template repository** pour un TP de **cybersécurité applicative** en **BTS SIO option SLAM**. Il permet de lancer :
 
-Le choix de la **version CLI de ZAP** est volontaire. En Codespaces, l'interface graphique de ZAP peut provoquer des redirections d'authentification et consommer inutilement les ressources. Ici, le travail se fait donc à partir de scripts simples, reproductibles et proches d'un usage **DevSecOps** réel.
+- **OWASP Juice Shop** comme **SUT** (*Software Under Test*) ;
+- **OWASP ZAP en ligne de commande uniquement** ;
+- un **scan baseline** (passif, plus rapide et moins risqué) ;
+- un **full scan rapide** (plus complet, mais volontairement limité pour rester utilisable dans GitHub Codespaces).
 
-## Objectifs pédagogiques
-
-Ce template permet de travailler les compétences suivantes :
-
-- identifier l'URL publique d'une application exécutée dans Codespaces ;
-- réaliser un **scan passif** avec ZAP ;
-- réaliser un **full scan rapide**, plus court et moins gourmand en mémoire qu'un full scan classique ;
-- interpréter un rapport HTML de sécurité ;
-- relier les alertes détectées aux thèmes du BTS SIO : protection des données, identité numérique de l'organisation, sécurité des usages, disponibilité, intégrité, confidentialité et sécurisation du développement.
-
-## SUT utilisé
-
-Le **SUT** (*Software Under Test*) est :
-
-**OWASP Juice Shop**
-
-Il s'agit d'une application web volontairement vulnérable, spécialement conçue pour l'apprentissage de la sécurité applicative. Elle est particulièrement adaptée à un travail de découverte des faiblesses d'une application web moderne.
-
-## Pourquoi deux modes de scan ?
-
-Le dépôt propose deux modes afin d'adapter la charge machine au temps d'une séance de TP :
-
-- un **scan passif**, à utiliser en priorité, car il est rapide et peu gourmand ;
-- un **full scan rapide**, limité volontairement pour éviter les traitements trop longs dans GitHub Codespaces.
-
-Le scan passif est le mode recommandé pour l'ensemble de la classe. Le full scan rapide peut être utilisé dans un second temps, lorsque le scan passif a déjà été interprété.
-
-## Contenu du dépôt
-
-- `scripts/start-sut.sh` : lance OWASP Juice Shop ;
-- `scripts/print-urls.sh` : rappelle comment récupérer l'URL publique Codespaces ;
-- `scripts/zap-passive-scan.sh` : lance un **scan passif** ;
-- `scripts/zap-full-scan-fast.sh` : lance un **full scan rapide** ;
-- `reports/` : contient les rapports HTML générés ;
-- `docs/TP-STUDENT.md` : support complémentaire pour les étudiants.
+L'objectif pédagogique est d'apprendre à **observer, analyser et interpréter** des alertes de sécurité applicative sur une application web volontairement vulnérable, dans un environnement maîtrisé.
 
 ---
 
-# Consignes étudiants
+## 1. Contexte professionnel
 
-## 1. Ouvrir le dépôt dans GitHub Codespaces
+Vous travaillez comme développeur ou analyste sécurité au sein d'une équipe chargée de vérifier la sécurité d'une application web avant une mise en production. Votre mission consiste à utiliser **OWASP ZAP** pour identifier des faiblesses de sécurité sur l'application **OWASP Juice Shop**.
 
-Depuis votre dépôt GitHub Classroom, ouvrez le projet avec **GitHub Codespaces**.
+Ce travail s'inscrit dans les compétences du **Bloc 3 du BTS SIO** :
 
-Attendez que le conteneur de développement soit entièrement prêt.
+- protéger les données à caractère personnel ;
+- préserver l'identité numérique de l'organisation ;
+- garantir la disponibilité, l'intégrité et la confidentialité des services ;
+- assurer la cybersécurité d'une solution applicative et de son développement.
 
-## 2. Lancer le SUT
+---
 
-Dans le terminal du Codespace, exécutez :
+## 2. Ce que contient ce dépôt
+
+- `docker-compose.yml` : lance **OWASP Juice Shop** ;
+- `.devcontainer/devcontainer.json` : configuration conseillée pour **GitHub Codespaces** ;
+- `scripts/start-sut.sh` : démarre Juice Shop ;
+- `scripts/stop-sut.sh` : arrête Juice Shop ;
+- `scripts/print-urls.sh` : rappelle comment récupérer l'URL publique du SUT dans Codespaces ;
+- `scripts/zap-baseline.sh` : lance un **scan baseline** avec génération d'un rapport HTML ;
+- `scripts/zap-full-rapid.sh` : lance un **full scan rapide**, borné pour réduire la consommation CPU et mémoire ;
+- `reports/` : dossier dans lequel seront générés les rapports.
+
+---
+
+## 3. Consignes de lancement dans GitHub Codespaces
+
+### Étape 1 — Ouvrir le dépôt dans Codespaces
+
+Depuis GitHub Classroom ou GitHub, ouvrez le dépôt avec **Code > Codespaces > Create codespace on main**.
+
+Attendez la fin du démarrage du conteneur.
+
+### Étape 2 — Lancer le SUT (OWASP Juice Shop)
+
+Dans le terminal de Codespaces, exécutez :
 
 ```bash
 bash scripts/start-sut.sh
 ```
 
-Ce script lance **OWASP Juice Shop** sur le **port 3000**.
+Cette commande lance **OWASP Juice Shop** avec Docker Compose.
 
-## 3. Récupérer l'URL publique de l'application
+### Étape 3 — Récupérer l'URL publique du SUT
 
-Dans GitHub Codespaces, ouvrez l'onglet **Ports**.
+Dans **Codespaces**, ouvrez l'onglet **PORTS**.
 
-Repérez le **port 3000**. Si besoin, rendez-le public.
+Repérez le port **3000**. Si nécessaire, rendez-le accessible en choisissant **Port Visibility > Public**.
 
-L'URL d'accès à l'application ne sera **pas** de la forme `http://localhost:3000`, mais de la forme :
+L'URL de l'application à tester sera de la forme :
 
 ```text
 https://<nom-du-codespace>-3000.app.github.dev
 ```
+
+**Important :** dans ce TP, les élèves **ne doivent pas utiliser `localhost`**. Ils doivent toujours utiliser **l'URL publique fournie par Codespaces**.
 
 Vous pouvez aussi afficher un rappel avec :
 
@@ -78,187 +75,208 @@ Vous pouvez aussi afficher un rappel avec :
 bash scripts/print-urls.sh
 ```
 
-Ouvrez ensuite cette URL dans votre navigateur. Vous devez voir **OWASP Juice Shop**.
+### Étape 4 — Vérifier l'accès à l'application
 
-## 4. Lancer le scan passif recommandé
+Ouvrez l'URL publique du port **3000** dans le navigateur.
 
-Commande :
-
-```bash
-bash scripts/zap-passive-scan.sh "https://<nom-du-codespace>-3000.app.github.dev"
-```
-
-Le rapport est généré dans :
-
-```text
-reports/zap-passive-report.html
-```
-
-## 5. Lancer le full scan rapide
-
-Commande :
-
-```bash
-bash scripts/zap-full-scan-fast.sh "https://<nom-du-codespace>-3000.app.github.dev"
-```
-
-Le rapport est généré dans :
-
-```text
-reports/zap-full-fast-report.html
-```
-
-## 6. Travail demandé
-
-Après exécution d'un scan, consultez le rapport HTML et relevez :
-
-- le nombre d'alertes détectées ;
-- les niveaux de gravité ;
-- les URL concernées ;
-- les mesures correctives proposées.
-
-Vous devez ensuite rédiger une courte analyse :
-
-1. Quelles vulnérabilités ou mauvaises configurations ont été détectées ?
-2. Lesquelles relèvent d'un problème de développement applicatif ?
-3. Lesquelles relèvent d'un problème de configuration HTTP ou navigateur ?
-4. Quelles corrections proposeriez-vous ?
+Vous devez voir **OWASP Juice Shop**.
 
 ---
 
-# Exercices pratiques personnalisés — BTS SIO SLAM
+## 4. Lancer OWASP ZAP en ligne de commande
 
-Les exercices ci-dessous sont conçus pour une séance de **2 heures**. Ils sont rédigés pour des étudiants de **BTS SIO option SLAM** et ciblent la **cybersécurité applicative** plutôt que la sécurité réseau.
+### Scan baseline recommandé
 
-## Exercice 1 — Vérifier que l'environnement de test est bien opérationnel
+Le **baseline scan** est le mode recommandé pour les étudiants, car il est plus rapide, consomme moins de ressources et produit un rapport exploitable en temps limité.
 
-1. Lancez le SUT avec le script fourni.
-2. Ouvrez l'application dans le navigateur à partir de l'URL publique Codespaces.
-3. Vérifiez que la page d'accueil de **OWASP Juice Shop** s'affiche correctement.
-4. Expliquez en quelques lignes pourquoi, dans GitHub Codespaces, on ne doit pas utiliser `localhost` depuis son poste local.
+Commande :
 
-**Production attendue :** une capture d'écran de l'application ouverte et une explication courte sur le rôle de l'URL publique.
+```bash
+bash scripts/zap-baseline.sh "https://<nom-du-codespace>-3000.app.github.dev"
+```
 
-## Exercice 2 — Réaliser un scan passif et relever les premières alertes
+Le rapport sera généré ici :
 
-1. Lancez le scan passif avec le script `zap-passive-scan.sh`.
+```text
+reports/baseline-report.html
+```
+
+### Full scan rapide
+
+Le **full scan rapide** réalise un scan plus complet, mais il a été **volontairement limité** pour éviter les scans trop longs ou trop gourmands dans Codespaces.
+
+Commande :
+
+```bash
+bash scripts/zap-full-rapid.sh "https://<nom-du-codespace>-3000.app.github.dev"
+```
+
+Le rapport sera généré ici :
+
+```text
+reports/full-rapid-report.html
+```
+
+---
+
+## 5. Différence entre les deux scans
+
+### Baseline scan
+
+Le baseline scan :
+
+- explore le site ;
+- attend la fin du **passive scanning** ;
+- ne lance pas d'attaques actives agressives ;
+- est adapté à un TP de 2 heures.
+
+### Full scan rapide
+
+Le full scan rapide :
+
+- explore davantage l'application ;
+- lance aussi des tests plus poussés ;
+- reste **bridé** pour limiter les ressources ;
+- doit être utilisé après le baseline scan, et non à sa place.
+
+---
+
+## 6. Exercices pratiques personnalisés — BTS SIO SLAM
+
+### Exercice 1 — Vérifier l'environnement de test
+
+1. Lancez `OWASP Juice Shop`.
+2. Repérez son URL publique dans Codespaces.
+3. Expliquez pourquoi l'URL d'accès ne doit pas contenir `localhost` dans ce contexte.
+4. Indiquez le rôle du **SUT** dans un audit de sécurité applicative.
+
+### Exercice 2 — Réaliser un scan baseline
+
+1. Lancez le script `zap-baseline.sh`.
 2. Ouvrez le rapport HTML généré.
-3. Relevez au moins **5 alertes** ou informations de sécurité présentes dans le rapport.
-4. Pour chacune, indiquez :
-   - le nom de l'alerte ;
+3. Relevez au moins **5 alertes**.
+4. Pour chaque alerte, indiquez :
+   - son nom ;
    - son niveau de gravité ;
-   - la ou les URL concernées ;
-   - le type de risque représenté pour une organisation.
+   - l'élément concerné (page, ressource, paramètre, en-tête HTTP, cookie, etc.).
 
-**Production attendue :** un tableau de 5 lignes minimum.
+### Exercice 3 — Classer les alertes selon les thèmes du BTS SIO
 
-## Exercice 3 — Classer les alertes par grands thèmes du BTS SIO
+À partir du rapport baseline, classez les alertes dans les catégories suivantes :
 
-À partir du rapport obtenu, classez les alertes dans les catégories suivantes :
+- protéger les données à caractère personnel ;
+- préserver l'identité numérique de l'organisation ;
+- sécuriser les équipements et les usages des utilisateurs ;
+- garantir la disponibilité, l'intégrité et la confidentialité des services ;
+- assurer la cybersécurité d'une solution applicative et de son développement.
 
-- **Protéger les données à caractère personnel** ;
-- **Préserver l'identité numérique de l'organisation** ;
-- **Sécuriser les équipements et les usages des utilisateurs** ;
-- **Garantir la disponibilité, l'intégrité et la confidentialité des services** ;
-- **Assurer la cybersécurité d'une solution applicative et de son développement**.
+Justifiez chaque classement en quelques phrases.
 
-Pour chaque catégorie, donnez au moins **un exemple d'alerte** et justifiez votre classement en une ou deux phrases.
+### Exercice 4 — Distinguer problème de développement et problème de configuration
 
-**Production attendue :** un classement argumenté.
+Pour au moins **6 alertes**, indiquez si le problème semble lié principalement :
 
-## Exercice 4 — Distinguer les problèmes de code et les problèmes de configuration
+- au **code applicatif** ;
+- à la **configuration HTTP / serveur** ;
+- à la **gestion des cookies / sessions** ;
+- ou à un **manque de durcissement général**.
 
-Choisissez **6 alertes** du rapport et répartissez-les dans deux colonnes :
+Expliquez votre réponse.
 
-- **problème de développement applicatif** ;
-- **problème de configuration de sécurité ou d'en-têtes HTTP**.
+### Exercice 5 — Proposer des mesures correctives
 
-Expliquez pour chaque ligne pourquoi vous placez l'alerte dans cette colonne.
+Choisissez **5 alertes** et proposez, pour chacune, une mesure corrective réaliste.
 
-**Production attendue :** un tableau comparatif clair.
+Exemples de pistes de réflexion :
 
-## Exercice 5 — Proposer des mesures correctives réalistes
+- ajout d'un en-tête HTTP de sécurité ;
+- limitation d'une fuite d'information ;
+- amélioration de la gestion de session ;
+- validation des entrées ;
+- durcissement du serveur.
 
-Sélectionnez **4 alertes** du rapport et proposez, pour chacune, une correction concrète.
+### Exercice 6 — Comparer baseline scan et full scan rapide
 
-Votre réponse doit préciser :
+1. Lancez le `full scan rapide`.
+2. Comparez le nouveau rapport avec celui du baseline scan.
+3. Répondez aux questions suivantes :
+   - Quelles alertes apparaissent dans les deux rapports ?
+   - Quelles alertes semblent nouvelles ?
+   - Le full scan rapide apporte-t-il des informations plus exploitables ?
+   - Le temps de traitement supplémentaire vous paraît-il justifié ?
 
-- ce qu'il faudrait modifier dans l'application ou sa configuration ;
-- quel bénéfice sécurité cela apporterait ;
-- si la correction relève plutôt du développeur, de l'administrateur système ou des deux.
+### Exercice 7 — Analyse métier
 
-**Production attendue :** 4 propositions argumentées.
+Choisissez **une alerte importante** et rédigez un paragraphe expliquant :
 
-## Exercice 6 — Lancer un full scan rapide et comparer les résultats
+- le risque technique ;
+- le risque métier pour l'entreprise ;
+- le risque potentiel pour les utilisateurs ;
+- la priorité de correction.
 
-1. Lancez le script `zap-full-scan-fast.sh`.
-2. Comparez le rapport issu du scan passif avec le rapport issu du full scan rapide.
-3. Indiquez :
-   - quelles alertes sont communes aux deux rapports ;
-   - quelles alertes apparaissent uniquement dans le full scan rapide ;
-   - si le gain d'informations obtenu justifie ou non le temps de traitement supplémentaire.
+### Exercice 8 — Compte rendu d'audit
 
-**Production attendue :** un paragraphe comparatif structuré.
+Rédigez une synthèse structurée comportant :
 
-## Exercice 7 — Analyse métier pour une entreprise fictive
-
-Contexte : vous travaillez pour une boutique en ligne fictive qui utilise une application comparable à **OWASP Juice Shop**. Le responsable vous demande quels risques les alertes détectées peuvent avoir pour l'entreprise.
-
-Rédigez une réponse structurée expliquant :
-
-- les conséquences possibles pour les clients ;
-- les conséquences possibles pour l'image de marque ;
-- les conséquences possibles pour la conformité réglementaire ;
-- les conséquences possibles pour la disponibilité du service.
-
-**Production attendue :** un court compte rendu rédigé en phrases complètes.
-
-## Exercice 8 — Synthèse finale type compte rendu d'audit
-
-Rédigez une synthèse de **10 à 15 lignes** répondant à la question suivante :
-
-**L'application testée peut-elle être mise en production en l'état ?**
-
-Votre réponse devra :
-
-- s'appuyer sur les résultats observés ;
-- distinguer les points les plus critiques des points secondaires ;
-- proposer un ordre de priorité pour les corrections.
-
-**Production attendue :** un avis argumenté de niveau technicien supérieur.
+- le contexte ;
+- l'outil utilisé ;
+- l'URL du SUT testée ;
+- le type de scan réalisé ;
+- les principales vulnérabilités observées ;
+- les mesures correctives recommandées ;
+- une conclusion sur le niveau de sécurité global de l'application.
 
 ---
 
-# Commandes utiles
+## 7. Commandes utiles
 
-Lancer le SUT :
+### Démarrer le SUT
 
 ```bash
 bash scripts/start-sut.sh
 ```
 
-Afficher un rappel sur l'URL Codespaces :
+### Arrêter le SUT
+
+```bash
+bash scripts/stop-sut.sh
+```
+
+### Afficher un rappel sur les URLs Codespaces
 
 ```bash
 bash scripts/print-urls.sh
 ```
 
-Lancer le scan passif :
+### Lancer le baseline scan
 
 ```bash
-bash scripts/zap-passive-scan.sh "https://<nom-du-codespace>-3000.app.github.dev"
+bash scripts/zap-baseline.sh "https://<nom-du-codespace>-3000.app.github.dev"
 ```
 
-Lancer le full scan rapide :
+### Lancer le full scan rapide
 
 ```bash
-bash scripts/zap-full-scan-fast.sh "https://<nom-du-codespace>-3000.app.github.dev"
-```
-
-Arrêter le SUT :
-
-```bash
-docker stop juice-shop
+bash scripts/zap-full-rapid.sh "https://<nom-du-codespace>-3000.app.github.dev"
 ```
 
 ---
+
+## 8. Recommandations importantes
+
+- N'utilisez ce dépôt **que dans un cadre pédagogique**.
+- Ne lancez **jamais** un scan ZAP contre un site qui ne vous appartient pas ou pour lequel vous n'avez pas d'autorisation.
+- Commencez toujours par le **baseline scan**.
+- Le **full scan rapide** doit rester un complément.
+
+---
+
+## 9. Remarque technique sur le full scan rapide
+
+Le script `zap-full-rapid.sh` a été réglé pour être **moins gourmand** que le full scan classique. Il réduit notamment :
+
+- la durée du spider ;
+- la durée maximale du scan ;
+- le périmètre exploré dans le cadre d'un TP.
+
+Il ne remplace donc pas un audit complet, mais il fournit un compromis intéressant entre **rapidité**, **charge machine** et **richesse pédagogique**.

@@ -1,17 +1,27 @@
 # Démarrage rapide
 
-1. Ouvrez ce dépôt dans GitHub Codespaces.
-2. Lancez le SUT :
+1. Ouvrir le dépôt dans GitHub Codespaces.
+2. Exécuter :
 
 ```bash
 bash scripts/start-sut.sh
 ```
 
-3. Récupérez l'URL publique du port 3000 dans l'onglet **Ports**.
-4. Lancez ensuite un scan passif :
+3. Dans l'onglet **PORTS**, repérer le port **3000** et récupérer son URL publique.
+4. Lancer le baseline scan :
 
 ```bash
-bash scripts/zap-passive-scan.sh "https://<nom-du-codespace>-3000.app.github.dev"
+bash scripts/zap-baseline.sh "https://<nom-du-codespace>-3000.app.github.dev"
 ```
 
-5. Ouvrez le rapport HTML dans le dossier `reports/`.
+5. Ouvrir le rapport :
+
+```text
+reports/baseline-report.html
+```
+
+6. Pour un scan plus complet mais limité :
+
+```bash
+bash scripts/zap-full-rapid.sh "https://<nom-du-codespace>-3000.app.github.dev"
+```

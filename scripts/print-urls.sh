@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
-set -euo pipefail
+cat <<'MSG'
+[INFO] Dans GitHub Codespaces :
+- ouvrez l'onglet PORTS ;
+- repérez le port 3000 ;
+- si besoin, rendez-le Public ;
+- copiez l'URL publique du type :
+  https://<nom-du-codespace>-3000.app.github.dev
 
-echo "Rappel : dans GitHub Codespaces, ouvrez l'onglet Ports."
-echo "Le SUT OWASP Juice Shop écoute sur le port 3000."
-echo "L'URL à utiliser dans ZAP n'est pas localhost, mais l'URL publique du port 3000."
-echo "Exemple : https://mon-codespace-3000.app.github.dev"
+Cette URL est celle du SUT (OWASP Juice Shop).
+Ne pas utiliser localhost depuis votre machine locale.
+MSG
