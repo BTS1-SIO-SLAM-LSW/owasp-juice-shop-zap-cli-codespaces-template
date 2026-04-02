@@ -1,22 +1,22 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-mkdir -p reports
+if [ $# -lt 1 ]; then
+  echo 'Usage : bash scripts/zap-baseline.sh "https://<url-cible>"'
+  exit 1
+fi
 
-TARGET_URL="${TARGET_URL:-http://host.docker.internal:3000}"
+TARGET_URL="$1"
+SPIDER_MINUTES="${SPIDER_MINUTES:-2}"
+REPORT_DIR="reports"
+REPORT_FILE="baseline-report.html"
 
-echo "[zap-baseline] Cible : ${TARGET_URL}"
-echo "[zap-baseline] Génération des rapports dans reports/"
+mkdir -p "${REPORT_DIR}" .zap/wrk
+chmod -R 777 "${REPORT_DIR}" .zap || true
 
-docker run --rm \
-  --add-host=host.docker.internal:host-gateway \
-  -v "$(pwd)/reports:/zap/wrk/:rw" \
-  ghcr.io/zaproxy/zaproxy:stable \
-  zap-baseline.py \
-  -t "$TARGET_URL" \
-  -r zap-baseline-report.html \
-  -J zap-baseline-report.json \
-  -w zap-baseline-report.md \
-  -m 5
+echo "[INFO] Cible : ${TARGET_URL}"
+echo "[INFO] Baseline scan avec spider limité à ${SPIDER_MINUTES} minute(s)."
 
-echo "[zap-baseline] Terminé."
+docker run --rm   -v "$(pwd)/${REPORT_DIR}:/zap/wrk/:rw"   ghcr.io/zaproxy/zaproxy:stable   zap-baseline.py -t "${TARGET_URL}" -m "${SPIDER_MINUTES}" -r "${REPORT_FILE}"
+
+echo "[OK] Rapport généré : ${REPORT_DIR}/${REPORT_FILE}"

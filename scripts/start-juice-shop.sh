@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo "[juice-shop] Téléchargement / lancement de Juice Shop..."
-docker stop juice-shop 2>/dev/null || true
-docker rm juice-shop 2>/dev/null || true
+PORT="${JUICE_SHOP_PORT:-3000}"
+CONTAINER_NAME="juice-shop"
+IMAGE="bkimminich/juice-shop"
 
-docker run -d \
-  --name juice-shop \
-  -p 3000:3000 \
-  bkimminich/juice-shop:latest
+if docker ps -a --format '{{.Names}}' | grep -q '^'"${CONTAINER_NAME}"'$'; then
+  echo "[INFO] Un conteneur ${CONTAINER_NAME} existe déjà. Suppression pour redémarrage propre..."
+  docker rm -f "${CONTAINER_NAME}" >/dev/null 2>&1 || true
+fi
 
-echo "[juice-shop] Juice Shop est en cours de démarrage sur le port 3000."
-echo "[juice-shop] Vérifie l'onglet PORTS dans Codespaces."
+echo "[INFO] Lancement de OWASP Juice Shop sur le port ${PORT}..."
+docker run --name "${CONTAINER_NAME}" -p "${PORT}:3000" --rm "${IMAGE}"

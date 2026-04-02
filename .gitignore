@@ -1,0 +1,4 @@
+.zap/
+reports/*.html
+reports/*.json
+reports/*.xml
